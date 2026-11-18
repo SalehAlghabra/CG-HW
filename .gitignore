@@ -1,0 +1,19 @@
+# Build outputs
+build/
+bin/
+out/
+
+# IDE files
+.idea/
+.vscode/ipch/
+*.VC.db
+*.opendb
+
+# Compiled binaries and libraries
+*.exe
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.pdb

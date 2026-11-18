@@ -1,0 +1,6 @@
+newmtl GoldMaterial
+Ka 0.25 0.20 0.07
+Kd 0.85 0.70 0.22
+Ks 0.90 0.85 0.60
+Ns 128.0
+map_Kd chalice_gold.png
