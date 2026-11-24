@@ -1,5 +1,5 @@
 // ==============================================================================
-// Project: Card Game 3D Scene - OpenGL & C++20
+// Project: Card Game 3D Scene - OpenGL & C++20 (Celebrity VIP Lounge Edition)
 // Subject: Computer Graphics (بيانيات الحاسوب 2026)
 // Requirements:
 //   1. طاولة تحوي 3 أقسام: مخزون اللاعب (Deck)، بطاقات اللاعب الملعوبة، بطاقات الخصم (فارغ).
@@ -7,15 +7,18 @@
 //      - الحالة 1: من فوق الطاولة تماماً (البطاقات موضوعة أفقياً).
 //      - الحالة 2: من منظور اللاعب (البطاقات تقف طولياً ليراها اللاعب).
 //      - الانتقال بينهما بالضغط على زري 1 و 2 مع تحريك سلس (Animation).
-//   3. مخزون اللاعب يحوي 5 بطاقات رباعية الأضلاع بصور لشخصيات خيالية مفضلة.
-//   4. الضغط على زر G ينقل بطاقة عشوائية من المخزون إلى اللعب مع تحريك (Animation).
+//   3. مخزون اللاعب يحوي 5 بطاقات رباعية الأضلاع بصور المشاهير المحبوبين:
+//      (Miranda Kerr, Dexter Morgan, Jason Statham, Jack Sparrow, Mahlagha Jaberi)
+//      مع إكساء خلفي فخم وموحد لجميع البطاقات، وتبقى البطاقات غير المسحوبة مسطحة على الطاولة دائماً.
+//   4. الضغط على زر G ينقل بطاقة عشوائية من المخزون إلى اللعب مع تدويرها 180 درجة لتواجه اللاعب.
 //      - الضغط للمرة السادسة لا يفعل شيئاً.
 //      - يعمل بنفس الطريقة في كلا المنظورين.
-//   5. غرفة واسعة بجدران ورق جدران وأرضية خشبية وتتسع لـ 3 قطع ديكور مختلفة ومميزة.
-//      - قطعة ديكور 1: موديل ثلاثي الأبعاد 3D Model (الكأس الأثري الذهبي عبر Assimp).
-//      - قطعة ديكور 2: خزانة كتب فخمة ثلاثية الأبعاد (Bookshelf).
-//      - قطعة ديكور 3: درع فروسية ملكي وسيوف متقاطعة على الحائط (Knight Shield & Swords).
-//   6. ملصق فني (The Starry Night) على أحد الجدران ممزق وناقص من زاوية هندسياً.
+//   5. غرفة واسعة بجدران ورق جدران فاخر وأرضية خشبية مصقولة وتتسع لقطع ديكور سمة المشاهير:
+//      - قطعة ديكور 1: تمثال الأوسكار الذهبي ثلاثي الأبعاد 3D Model عبر Assimp على قاعدة فاخرة.
+//      - قطعة ديكور 2: خزانة المشاهير للأسطوانات البلاتينية والجوائز (Celebrity VIP Showcase).
+//      - قطعة ديكور 3: نجمة ممر الشهرة وأشعة الأضواء الذهبية (Walk of Fame Star Crest).
+//      - قطعة ديكور إضافية مميزة: السجادة الحمراء وأعمدة الحبال المخملية (VIP Red Carpet & Stanchions).
+//   6. ملصق فني ممزق وناقص من زاوية هندسياً لسمة المشاهير على الجدار الخلفي وتظهر خلفه خلفية الجدار.
 // ==============================================================================
 
 #include <iostream>
@@ -67,7 +70,7 @@ bool key1Pressed = false;
 bool key2Pressed = false;
 bool keyRPressed = false;
 
-std::string lastActionMessage = "مرحباً! اضغط [G] لسحب بطاقة، و [1] أو [2] لتبديل منظور الكاميرا.";
+std::string lastActionMessage = "مرحباً بك في صالة المشاهير! اضغط [G] لسحب بطاقة وقلبها، و [1] أو [2] لتبديل الكاميرا.";
 
 // دالة رد النداء لتغيير حجم نافذة العرض
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -86,7 +89,7 @@ void playRandomCard() {
 
     // إذا لم يتبق أي بطاقة في المخزون (الضغط للمرة السادسة فما فوق): لا يحدث شيء
     if (deckIndices.empty()) {
-        lastActionMessage = "تم لعب جميع البطاقات الخمس! (الضغط للمرة السادسة لا يفعل شيئاً).";
+        lastActionMessage = "تم لعب جميع بطاقات المشاهير الخمس! (الضغط للمرة السادسة لا يفعل شيئاً).";
         std::cout << "[Game] " << lastActionMessage << std::endl;
         return;
     }
@@ -98,14 +101,14 @@ void playRandomCard() {
     // تحديد الفتحة التالية في منطقة اللعب (0 إلى 4)
     int targetSlot = 5 - static_cast<int>(deckIndices.size());
 
-    // إطلاق حركة انتقال البطاقة ثلاثية الأبعاد
+    // إطلاق حركة انتقال وتدوير البطاقة ثلاثية الأبعاد
     cards[selectedCard].playToSlot(targetSlot, gameTable.playedSlots[targetSlot]);
 
-    lastActionMessage = "تم لعب البطاقة: " + cards[selectedCard].characterName + " إلى الفتحة " + std::to_string(targetSlot + 1);
+    lastActionMessage = "تم سحب بطاقة: " + cards[selectedCard].characterName + " وقلبها لتواجه اللاعب في الفتحة " + std::to_string(targetSlot + 1);
     std::cout << "[Game] " << lastActionMessage << std::endl;
 }
 
-// إعادة تشغيل الجولة وجمع البطاقات إلى المخزون (للتجربة السهلة)
+// إعادة تشغيل الجولة وجمع البطاقات إلى المخزون (مقلوبة ومستوية على الطاولة)
 void resetGame() {
     for (size_t i = 0; i < cards.size(); ++i) {
         cards[i].state = CardState::IN_DECK;
@@ -118,7 +121,7 @@ void resetGame() {
         cards[i].startPos = dPos;
         cards[i].targetPos = dPos;
     }
-    lastActionMessage = "تمت إعادة ضبط اللعبة وعودة البطاقات الخمس إلى المخزون.";
+    lastActionMessage = "تمت إعادة ضبط اللعبة وعودة بطاقات المشاهير إلى المخزون (مسطحة ومقلوبة على الطاولة).";
     std::cout << "[Game] " << lastActionMessage << std::endl;
 }
 
@@ -131,7 +134,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         if (!key1Pressed) {
             cameraManager.switchToState(1);
-            lastActionMessage = "الانتقال إلى الحالة 1: منظور علوي فوق الطاولة (تستوي البطاقات أفقياً).";
+            lastActionMessage = "الانتقال إلى الحالة 1: منظور علوي فوق الطاولة (تستوي البطاقات الملعوبة أفقياً).";
             key1Pressed = true;
         }
     } else {
@@ -142,14 +145,14 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
         if (!key2Pressed) {
             cameraManager.switchToState(2);
-            lastActionMessage = "الانتقال إلى الحالة 2: منظور اللاعب (تقف البطاقات طولياً).";
+            lastActionMessage = "الانتقال إلى الحالة 2: منظور اللاعب (تقف البطاقات الملعوبة طولياً لتواجه اللاعب).";
             key2Pressed = true;
         }
     } else {
         key2Pressed = false;
     }
 
-    // زر G: لعب بطاقة عشوائية مع تحريك (المتطلب 4)
+    // زر G: لعب بطاقة عشوائية مع تدويرها وتحليقها (المتطلب 4)
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
         if (!keyGPressed) {
             playRandomCard();
@@ -159,7 +162,7 @@ void processInput(GLFWwindow* window) {
         keyGPressed = false;
     }
 
-    // زر R: إعادة تعيين (اختياري للمساعدة في الفحص)
+    // زر R: إعادة تعيين اللعبة
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         if (!keyRPressed) {
             resetGame();
@@ -178,7 +181,7 @@ std::string resolvePath(const std::string& relPath) {
 }
 
 int main(int argc, char* argv[]) {
-    // 1. ضبط مسار التشغيل الحالي ليطابق مسار الملف التنفيذي بأمان تام
+    // 1. ضبط مسار التشغيل الحالي ليطابق مسار الملف التنفيذي بأمان
     try {
         if (argc > 0 && argv[0] != nullptr) {
             std::filesystem::path p(argv[0]);
@@ -208,7 +211,7 @@ int main(int argc, char* argv[]) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4); // Anti-aliasing
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Card Game Scene - Computer Graphics 2026", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Celebrity VIP Lounge - Computer Graphics 2026", NULL, NULL);
     if (!window) {
         std::cerr << "Failed to create GLFW window!" << std::endl;
         glfwTerminate();
@@ -236,42 +239,61 @@ int main(int argc, char* argv[]) {
     // 6. تحميل الشيدرات (Vertex & Fragment Shaders)
     Shader sceneShader(resolvePath("shaders/vs/scene.vs").c_str(), resolvePath("shaders/fs/scene.fs").c_str());
 
-    // 7. تحميل الإكساءات (Textures)
+    // 7. تحميل الإكساءات (Celebrity VIP Lounge Textures)
     std::cout << "[Init] Loading textures..." << std::endl;
     unsigned int texTable       = load_texture(resolvePath("assets/textures/table_wood.png").c_str());
     unsigned int texFloor       = load_texture(resolvePath("assets/textures/floor_wood.png").c_str());
     unsigned int texWallpaper   = load_texture(resolvePath("assets/textures/wallpaper.png").c_str());
-    unsigned int texPoster      = load_texture(resolvePath("assets/textures/poster_starry_night.png").c_str());
-    unsigned int texBookshelf   = load_texture(resolvePath("assets/textures/bookshelf.png").c_str());
-    unsigned int texShield      = load_texture(resolvePath("assets/textures/shield.png").c_str());
+
+    // إكساء الملصق الفني الممزق في الجدار الخلفي
+    std::string posterPath = resolvePath("assets/textures/poster_celebrity.png");
+    if (!std::filesystem::exists(posterPath)) posterPath = resolvePath("assets/textures/poster_starry_night.png");
+    unsigned int texPoster      = load_texture(posterPath.c_str());
+
+    // إكساء خزانة المشاهير للأسطوانات البلاتينية
+    std::string showcasePath = resolvePath("assets/textures/showcase_celebrity.png");
+    if (!std::filesystem::exists(showcasePath)) showcasePath = resolvePath("assets/textures/bookshelf.png");
+    unsigned int texBookshelf   = load_texture(showcasePath.c_str());
+
+    // إكساء نجمة ممر الشهرة للمشاهير
+    std::string starPath = resolvePath("assets/textures/celebrity_star.png");
+    if (!std::filesystem::exists(starPath)) starPath = resolvePath("assets/textures/shield.png");
+    unsigned int texShield      = load_texture(starPath.c_str());
+
+    // الإكساء الخلفي الفخم الموحد لجميع البطاقات
     unsigned int texCardBack    = load_texture(resolvePath("assets/textures/card_back.png").c_str());
 
-    // إكساءات بطاقات الشخصيات الخيالية الخمس (المتطلب 3)
-    unsigned int texGeralt      = load_texture(resolvePath("assets/textures/card_geralt.png").c_str());
-    unsigned int texGandalf     = load_texture(resolvePath("assets/textures/card_gandalf.png").c_str());
-    unsigned int texBatman      = load_texture(resolvePath("assets/textures/card_batman.png").c_str());
-    unsigned int texSpiderman   = load_texture(resolvePath("assets/textures/card_spiderman.png").c_str());
-    unsigned int texGoku        = load_texture(resolvePath("assets/textures/card_goku.png").c_str());
+    // إكساءات بطاقات المشاهير الخمس
+    std::string mirandaPath = resolvePath("assets/textures/Miranda2.jpg");
+    if (!std::filesystem::exists(mirandaPath)) mirandaPath = resolvePath("assets/textures/Miranda.jpg");
+    unsigned int texMiranda     = load_texture(mirandaPath.c_str());
+    unsigned int texDexter      = load_texture(resolvePath("assets/textures/Dexter.jpg").c_str());
+    unsigned int texStatham     = load_texture(resolvePath("assets/textures/Jason Statham.jpg").c_str());
+    unsigned int texJackSparrow = load_texture(resolvePath("assets/textures/Jack Sparrow.png").c_str());
+    unsigned int texMahlagha    = load_texture(resolvePath("assets/textures/Mahlagha Jaberi.jpg").c_str());
 
     // 8. تهيئة مجسمات الطاولة والغرفة والديكور
     gameTable.init(texTable);
-    gameRoom.init(texFloor, texWallpaper, texPoster, texBookshelf, texShield, resolvePath("assets/models/chalice.obj"));
+
+    std::string modelFile = resolvePath("assets/models/oscar_trophy.obj");
+    if (!std::filesystem::exists(modelFile)) modelFile = resolvePath("assets/models/chalice.obj");
+    gameRoom.init(texFloor, texWallpaper, texPoster, texBookshelf, texShield, modelFile);
 
     // مجسمات البطاقات (وجه أمامي وخلفي)
     cardFrontMesh = MeshBuilder::createCardFront(0.72f, 1.08f);
     cardBackMesh  = MeshBuilder::createCardBack(0.72f, 1.08f);
 
-    // 9. إنشاء البطاقات الخمس في منطقة المخزون (Deck)
+    // 9. إنشاء بطاقات المشاهير الخمس في منطقة المخزون (Deck)
     struct CharacterCardInfo {
         std::string name;
         unsigned int textureId;
     };
     std::vector<CharacterCardInfo> cardData = {
-        {"Geralt of Rivia (The Witcher)", texGeralt},
-        {"Gandalf the Grey (Lord of the Rings)", texGandalf},
-        {"Batman (DC Comics)", texBatman},
-        {"Spider-Man (Marvel)", texSpiderman},
-        {"Son Goku (Dragon Ball)", texGoku}
+        {"Miranda Kerr (Supermodel)", texMiranda},
+        {"Dexter Morgan (Michael C. Hall)", texDexter},
+        {"Jason Statham (Action Star)", texStatham},
+        {"Captain Jack Sparrow (Johnny Depp)", texJackSparrow},
+        {"Mahlagha Jaberi (Fashion Icon)", texMahlagha}
     };
 
     cards.clear();
@@ -282,7 +304,7 @@ int main(int argc, char* argv[]) {
         cards.emplace_back(cardData[i].name, cardData[i].textureId, texCardBack, dPos);
     }
 
-    std::cout << "[Init] Scene setup complete! Starting render loop..." << std::endl;
+    std::cout << "[Init] Celebrity VIP Lounge setup complete! Starting render loop..." << std::endl;
 
     // توقيت الإطارات
     float lastFrameTime = static_cast<float>(glfwGetTime());
@@ -305,7 +327,7 @@ int main(int argc, char* argv[]) {
         }
 
         // مسح مخزن اللون ومخزن العمق
-        glClearColor(0.06f, 0.07f, 0.10f, 1.0f);
+        glClearColor(0.05f, 0.06f, 0.09f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // حساب مصفوفات العرض والإسقاط
@@ -322,18 +344,18 @@ int main(int argc, char* argv[]) {
         sceneShader.setMat4("view", view);
         sceneShader.setVec3("viewPos", cameraManager.currentPos);
 
-        // إضاءة الغرفة (ثريا دافئة معلقة فوق الطاولة)
+        // إضاءة صالة المشاهير (ثريا هوليوود الدافئة فوق الطاولة)
         sceneShader.setVec3("lightPos", glm::vec3(0.0f, 6.2f, 0.2f));
-        sceneShader.setVec3("lightColor", glm::vec3(1.0f, 0.95f, 0.88f));
-        sceneShader.setFloat("ambientStrength", 0.60f);
+        sceneShader.setVec3("lightColor", glm::vec3(1.0f, 0.94f, 0.85f));
+        sceneShader.setFloat("ambientStrength", 0.65f);
 
-        // 1. رسم الغرفة الواسعة + ورق الجدران + الملصق الممزق + قطع الديكور الثلاث
+        // 1. رسم صالة المشاهير + ورق الجدران الفاخر + الملصق الممزق + قطع الديكور الأربعة
         gameRoom.render(sceneShader);
 
-        // 2. رسم الطاولة الخشبية بأقسامها الثلاثة (المخزون، اللعب، الخصم)
+        // 2. رسم طاولة المشاهير الفاخرة بأقسامها الثلاثة (المخزون، اللعب، الخصم)
         gameTable.render(sceneShader);
 
-        // 3. رسم البطاقات الخمس مع تطبيق مصفوفات التحريك والوقوف/التسطيح
+        // 3. رسم بطاقات المشاهير الخمس (المخزون يبقى مسطحاً ومقلوباً، والمسحوبة تدور 180 درجة وتواجه اللاعب)
         float standProgress = cameraManager.getCardStandProgress();
         for (auto& card : cards) {
             card.render(sceneShader, cardFrontMesh, cardBackMesh, standProgress);
@@ -347,17 +369,17 @@ int main(int argc, char* argv[]) {
         ImGui::NewFrame();
 
         ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(420, 310), ImGuiCond_FirstUseEver);
-        ImGui::Begin("Card Game Controls & Inspector", nullptr, ImGuiWindowFlags_NoCollapse);
+        ImGui::SetNextWindowSize(ImVec2(440, 320), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Celebrity VIP Lounge & Inspector", nullptr, ImGuiWindowFlags_NoCollapse);
 
-        ImGui::TextColored(ImVec4(0.9f, 0.8f, 0.2f, 1.0f), "Computer Graphics 2026 - Card Game");
+        ImGui::TextColored(ImVec4(0.95f, 0.82f, 0.25f, 1.0f), "Computer Graphics 2026 - Celebrity VIP Edition");
         ImGui::Separator();
 
         // عرض وضع الكاميرا الحالي
         if (cameraManager.targetState == 1) {
-            ImGui::Text("Camera State: [1] Top-Down View (Flat Cards)");
+            ImGui::Text("Camera State: [1] Top-Down View (Flat Cards on Table)");
         } else {
-            ImGui::Text("Camera State: [2] Player Perspective (Standing Cards)");
+            ImGui::Text("Camera State: [2] Player Perspective (Standing Cards Face Player)");
         }
 
         // أزرار تبديل الكاميرا
@@ -368,7 +390,7 @@ int main(int argc, char* argv[]) {
         ImGui::SameLine();
         if (ImGui::Button("State 2: Player View (Key 2)")) {
             cameraManager.switchToState(2);
-            lastActionMessage = "تم اختيار منظور اللاعب [2] (وقوف البطاقات).";
+            lastActionMessage = "تم اختيار منظور اللاعب [2] (وقوف البطاقات لتواجه اللاعب).";
         }
 
         ImGui::Separator();
@@ -381,11 +403,11 @@ int main(int argc, char* argv[]) {
             else playedCount++;
         }
 
-        ImGui::Text("Cards in Deck: %d / 5", inDeckCount);
-        ImGui::Text("Cards Played:  %d / 5", playedCount);
+        ImGui::Text("Undrawn Cards in Deck: %d / 5 (Always flat face-down)", inDeckCount);
+        ImGui::Text("Played Celebrity Cards: %d / 5", playedCount);
 
         // زر لعب بطاقة عشوائية
-        if (ImGui::Button("Play Random Card (Key G)", ImVec2(220, 28))) {
+        if (ImGui::Button("Play Random Card (Key G)", ImVec2(230, 28))) {
             playRandomCard();
         }
         ImGui::SameLine();
@@ -398,10 +420,10 @@ int main(int argc, char* argv[]) {
 
         ImGui::Separator();
         ImGui::Text("Controls Guide:");
-        ImGui::BulletText("[1]: Top-Down camera (cards lie flat)");
-        ImGui::BulletText("[2]: Player perspective (cards stand upright)");
-        ImGui::BulletText("[G]: Play random card to table (Animation)");
-        ImGui::BulletText("[R]: Reset all cards back to deck");
+        ImGui::BulletText("[1]: Top-Down camera (cards lie flat on table)");
+        ImGui::BulletText("[2]: Player perspective (drawn cards stand facing player)");
+        ImGui::BulletText("[G]: Play card (lifts, flips 180 deg to face player)");
+        ImGui::BulletText("[R]: Reset all cards back to deck (flat face-down)");
         ImGui::BulletText("[ESC]: Close window");
 
         ImGui::End();
@@ -429,11 +451,11 @@ int main(int argc, char* argv[]) {
     glDeleteTextures(1, &texBookshelf);
     glDeleteTextures(1, &texShield);
     glDeleteTextures(1, &texCardBack);
-    glDeleteTextures(1, &texGeralt);
-    glDeleteTextures(1, &texGandalf);
-    glDeleteTextures(1, &texBatman);
-    glDeleteTextures(1, &texSpiderman);
-    glDeleteTextures(1, &texGoku);
+    glDeleteTextures(1, &texMiranda);
+    glDeleteTextures(1, &texDexter);
+    glDeleteTextures(1, &texStatham);
+    glDeleteTextures(1, &texJackSparrow);
+    glDeleteTextures(1, &texMahlagha);
 
     shutdown_ImGui();
     glfwDestroyWindow(window);
