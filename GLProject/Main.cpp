@@ -70,7 +70,7 @@ bool key1Pressed = false;
 bool key2Pressed = false;
 bool keyRPressed = false;
 
-std::string lastActionMessage = "مرحباً بك في صالة المشاهير! اضغط [G] لسحب بطاقة وقلبها، و [1] أو [2] لتبديل الكاميرا.";
+std::string lastActionMessage = "Welcome to Celebrity VIP Lounge! Press [G] to play a card, [1] or [2] to switch camera.";
 
 // دالة رد النداء لتغيير حجم نافذة العرض
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -89,7 +89,7 @@ void playRandomCard() {
 
     // إذا لم يتبق أي بطاقة في المخزون (الضغط للمرة السادسة فما فوق): لا يحدث شيء
     if (deckIndices.empty()) {
-        lastActionMessage = "تم لعب جميع بطاقات المشاهير الخمس! (الضغط للمرة السادسة لا يفعل شيئاً).";
+        lastActionMessage = "All 5 celebrity cards have been played! (6th press does nothing).";
         std::cout << "[Game] " << lastActionMessage << std::endl;
         return;
     }
@@ -104,7 +104,7 @@ void playRandomCard() {
     // إطلاق حركة انتقال وتدوير البطاقة ثلاثية الأبعاد
     cards[selectedCard].playToSlot(targetSlot, gameTable.playedSlots[targetSlot]);
 
-    lastActionMessage = "تم سحب بطاقة: " + cards[selectedCard].characterName + " وقلبها لتواجه اللاعب في الفتحة " + std::to_string(targetSlot + 1);
+    lastActionMessage = "Drew: " + cards[selectedCard].characterName + " -> Slot " + std::to_string(targetSlot + 1) + " (Flipped 180 deg to face player).";
     std::cout << "[Game] " << lastActionMessage << std::endl;
 }
 
@@ -121,7 +121,7 @@ void resetGame() {
         cards[i].startPos = dPos;
         cards[i].targetPos = dPos;
     }
-    lastActionMessage = "تمت إعادة ضبط اللعبة وعودة بطاقات المشاهير إلى المخزون (مسطحة ومقلوبة على الطاولة).";
+    lastActionMessage = "Game reset: all celebrity cards returned to deck (flat face-down).";
     std::cout << "[Game] " << lastActionMessage << std::endl;
 }
 
@@ -134,7 +134,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         if (!key1Pressed) {
             cameraManager.switchToState(1);
-            lastActionMessage = "الانتقال إلى الحالة 1: منظور علوي فوق الطاولة (تستوي البطاقات الملعوبة أفقياً).";
+            lastActionMessage = "Switched to State 1: Top-Down view (cards lie flat horizontally).";
             key1Pressed = true;
         }
     } else {
@@ -145,7 +145,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
         if (!key2Pressed) {
             cameraManager.switchToState(2);
-            lastActionMessage = "الانتقال إلى الحالة 2: منظور اللاعب (تقف البطاقات الملعوبة طولياً لتواجه اللاعب).";
+            lastActionMessage = "Switched to State 2: Player perspective (cards stand facing player).";
             key2Pressed = true;
         }
     } else {
@@ -175,8 +175,10 @@ void processInput(GLFWwindow* window) {
 
 std::string resolvePath(const std::string& relPath) {
     if (std::filesystem::exists(relPath)) return relPath;
-    if (std::filesystem::exists("build/" + relPath)) return "build/" + relPath;
     if (std::filesystem::exists("GLProject/" + relPath)) return "GLProject/" + relPath;
+    if (std::filesystem::exists("../GLProject/" + relPath)) return "../GLProject/" + relPath;
+    if (std::filesystem::exists("build/" + relPath)) return "build/" + relPath;
+    if (std::filesystem::exists("../" + relPath)) return "../" + relPath;
     return relPath;
 }
 
@@ -246,7 +248,8 @@ int main(int argc, char* argv[]) {
     unsigned int texWallpaper   = load_texture(resolvePath("assets/textures/wallpaper.png").c_str());
 
     // إكساء الملصق الفني الممزق في الجدار الخلفي
-    std::string posterPath = resolvePath("assets/textures/poster_celebrity.png");
+    std::string posterPath = resolvePath("assets/textures/poster.jpg");
+    if (!std::filesystem::exists(posterPath)) posterPath = resolvePath("assets/textures/poster_celebrity.png");
     if (!std::filesystem::exists(posterPath)) posterPath = resolvePath("assets/textures/poster_starry_night.png");
     unsigned int texPoster      = load_texture(posterPath.c_str());
 
@@ -385,12 +388,12 @@ int main(int argc, char* argv[]) {
         // أزرار تبديل الكاميرا
         if (ImGui::Button("State 1: Top-Down (Key 1)")) {
             cameraManager.switchToState(1);
-            lastActionMessage = "تم اختيار المنظور العلوي [1] (تسطيح البطاقات).";
+            lastActionMessage = "Switched to State 1: Top-Down view (cards lie flat).";
         }
         ImGui::SameLine();
         if (ImGui::Button("State 2: Player View (Key 2)")) {
             cameraManager.switchToState(2);
-            lastActionMessage = "تم اختيار منظور اللاعب [2] (وقوف البطاقات لتواجه اللاعب).";
+            lastActionMessage = "Switched to State 2: Player view (cards stand facing player).";
         }
 
         ImGui::Separator();

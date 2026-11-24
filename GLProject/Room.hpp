@@ -74,8 +74,8 @@ public:
         wallMesh = MeshBuilder::createQuad(roomWidth, roomHeight, 4.0f, 2.0f, false);
         ceilingMesh = MeshBuilder::createQuad(roomWidth, roomDepth, 4.0f, 4.0f, true);
 
-        // 2. الملصق الفني الممزق: موضوع في المنطقة الوسطى بارتفاع مناسب بدون تداخل مع النجمة
-        tornPosterMesh = MeshBuilder::createTornPosterBackWall(2.2f, 1.5f);
+        // 2. الملصق الفني الممزق: بأبعاد متوافقة تماماً مع نسبة أبعاد الصورة (Aspect Ratio = 960x1200 = 0.8)
+        tornPosterMesh = MeshBuilder::createTornPosterBackWall(1.68f, 2.10f);
 
         // 3. قاعدة تمثال الأوسكار ثلاثي الأبعاد
         oscarPedestalMesh = MeshBuilder::createBox(0.85f, 2.15f, 0.85f, 1.0f, 2.0f);
@@ -263,20 +263,11 @@ public:
         showcaseFrontMesh.draw();
 
         // -------------------------------------------------------------
-        // 4. المنطقة الوسطى (Middle Area): الملصق الفني الممزق ونجمة ممر الشهرة بدون أي تداخل
         // -------------------------------------------------------------
-        // أ) الملصق الفني الممزق في المنتصف بارتفاع مناسب (Y = 1.95)
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, posterTextureId);
-        shader.setInt("texture_diffuse1", 0);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 1.95f, -roomDepth * 0.5f + 0.05f));
-        shader.setMat4("model", model);
-        tornPosterMesh.draw();
-
-        // ب) نجمة ممر الشهرة في المنتصف أعلى الملصق مباشرة (Y = 3.45) مع فاصل كافٍ لمنع أي تداخل
-        glm::vec3 starPos(0.0f, 3.45f, -roomDepth * 0.5f + 0.07f);
+        // 4. المنطقة الوسطى: نجمة ممر الشهرة في المنتصف تماماً، والملصق الفني الممزق على يسارها
+        // -------------------------------------------------------------
+        // أ) نجمة ممر الشهرة في المنتصف تماماً (X = 0.0, Y = 2.25) واضحة في مجال رؤية اللاعب
+        glm::vec3 starPos(0.0f, 2.25f, -roomDepth * 0.5f + 0.07f);
 
         // أشعة الأضواء الذهبية المتقاطعة
         shader.setBool("useTexture", false);
@@ -303,6 +294,16 @@ public:
         model = glm::translate(model, starPos);
         shader.setMat4("model", model);
         starCrestMesh.draw();
+
+        // ب) الملصق الفني الممزق على يسار النجمة (X = -2.10, Y = 2.15) بأبعاده الصحيحة
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, posterTextureId);
+        shader.setInt("texture_diffuse1", 0);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-2.10f, 2.15f, -roomDepth * 0.5f + 0.05f));
+        shader.setMat4("model", model);
+        tornPosterMesh.draw();
     }
 
     void cleanup() {
