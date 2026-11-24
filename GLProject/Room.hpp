@@ -16,35 +16,38 @@ public:
     SimpleMesh wallMesh;
     SimpleMesh ceilingMesh;
 
-    // مجسم الملصق الفني الممزق في الجدار الخلفي (Requirement 6 - The Torn Art Poster)
+    // مجسم الملصق الفني الممزق في المنتصف (Requirement 6 - The Torn Art Poster)
     SimpleMesh tornPosterMesh;
 
-    // قطع الديكور الثلاث الأساسية (Decor Pieces 1, 2, 3 - Requirement 5):
-    // Decor 1: قاعدة خشبية فاخرة + مجسم ثلاثي الأبعاد لتمثال الأوسكار الذهبي (Assimp 3D Model)
+    // قطع الديكور الأساسية:
+    // Decor 1: قاعدة فاخرة + مجسم تمثال الأوسكار الذهبي ثلاثي الأبعاد
     SimpleMesh oscarPedestalMesh;
     SimpleMesh oscarPedestalCapMesh;
     Model* oscar3DModel = nullptr;
 
-    // Decor 2: خزانة المشاهير الفاخرة للأسطوانات البلاتينية والجوائز (Celebrity VIP Showcase)
+    // Decor 2: خزانة المشاهير للأسطوانات والجوائز (VIP Showcase في الزاوية اليمينية وتواجه اللاعب)
     SimpleMesh showcaseFrameMesh;
     SimpleMesh showcaseFrontMesh;
 
-    // Decor 3: شعار نجمة هوليوود وأشعة الأضواء الذهبية (Walk of Fame Star Crest & Golden Beams)
+    // Decor 3: نجمة ممر الشهرة في المنتصف أعلى الملصق بدون أي تداخل
     SimpleMesh starCrestMesh;
     SimpleMesh beamBladeMesh;
 
-    // قطعة الديكور الإضافية المميزة لسمة المشاهير (Decor 4 - VIP Red Carpet & Stanchions):
+    // Decor 4: السجادة الحمراء في الزاوية اليسارية مع أعمدة الحواجز والحبال المخملية
     SimpleMesh redCarpetMesh;
     SimpleMesh redCarpetBorderMesh;
     SimpleMesh stanchionPostMesh;
     SimpleMesh stanchionBaseMesh;
     SimpleMesh stanchionBallMesh;
+
     SimpleMesh velvetRopeLeft1;
     SimpleMesh velvetRopeLeft2;
+    SimpleMesh velvetRopeLeft3;
     SimpleMesh velvetRopeRight1;
     SimpleMesh velvetRopeRight2;
+    SimpleMesh velvetRopeRight3;
 
-    // معرفات التكستشر للغرفة والديكور
+    // معرفات الإكساءات
     unsigned int floorTextureId = 0;
     unsigned int wallpaperTextureId = 0;
     unsigned int posterTextureId = 0;
@@ -66,17 +69,15 @@ public:
         bookshelfTextureId = bookTex;
         shieldTextureId = shieldTex;
 
-        // 1. إنشاء مجسمات أرضية وجدران الغرفة
+        // 1. أرضية وجدران الغرفة
         floorMesh = MeshBuilder::createQuad(roomWidth, roomDepth, 4.0f, 4.0f, true);
         wallMesh = MeshBuilder::createQuad(roomWidth, roomHeight, 4.0f, 2.0f, false);
         ceilingMesh = MeshBuilder::createQuad(roomWidth, roomDepth, 4.0f, 4.0f, true);
 
-        // 2. إنشاء مجسم الملصق الفني الممزق في الجدار الخلفي (Torn Celebrity Gala Poster)
-        // موضوع على الجدار الخلفي ليظهر بوضوح تام خلف طاولة اللعب في منظور اللاعب، مع زاوية سفلية ممزقة هندسياً
-        tornPosterMesh = MeshBuilder::createTornPosterBackWall(2.8f, 2.8f);
+        // 2. الملصق الفني الممزق: موضوع في المنطقة الوسطى بارتفاع مناسب بدون تداخل مع النجمة
+        tornPosterMesh = MeshBuilder::createTornPosterBackWall(2.2f, 1.5f);
 
-        // 3. تجهيز قطع الديكور الثلاث:
-        // أ) قطعة الديكور 1: قاعدة تمثال الأوسكار الذهبي ثلاثي الأبعاد
+        // 3. قاعدة تمثال الأوسكار ثلاثي الأبعاد
         oscarPedestalMesh = MeshBuilder::createBox(0.85f, 2.15f, 0.85f, 1.0f, 2.0f);
         oscarPedestalCapMesh = MeshBuilder::createBox(1.0f, 0.10f, 1.0f, 1.0f, 1.0f);
         try {
@@ -86,28 +87,30 @@ public:
             std::cerr << "[Room] Error loading 3D model: " << e.what() << std::endl;
         }
 
-        // ب) قطعة الديكور 2: خزانة المشاهير للأسطوانات البلاتينية والجوائز (Celebrity VIP Showcase)
-        // إطار ثلاثي الأبعاد أنيق مع لوحة أمامية مكسوة بالأسطوانات البلاتينية والذهبية دون أي تشوه
-        showcaseFrameMesh = MeshBuilder::createBox(2.8f, 4.2f, 0.65f, 1.0f, 1.0f);
-        showcaseFrontMesh = MeshBuilder::createQuad(2.65f, 4.05f, 1.0f, 1.0f, false);
+        // 4. خزانة المشاهير (VIP Showcase): في الزاوية اليمينية خلف الخصم ومواجهة لمنظور اللاعب
+        showcaseFrameMesh = MeshBuilder::createBox(2.8f, 3.6f, 0.65f, 1.0f, 1.0f);
+        showcaseFrontMesh = MeshBuilder::createQuad(2.65f, 3.45f, 1.0f, 1.0f, false);
 
-        // ج) قطعة الديكور 3: نجمة هوليوود وأشعة الأضواء الذهبية أعلى الجدار الخلفي
-        starCrestMesh = MeshBuilder::createQuad(2.2f, 2.2f, 1.0f, 1.0f, false);
-        beamBladeMesh = MeshBuilder::createBox(0.08f, 3.8f, 0.04f, 1.0f, 1.0f);
+        // 5. نجمة ممر الشهرة وأشعتها: في المنطقة الوسطى أعلى الملصق بدون أي تقاطع أو تداخل
+        starCrestMesh = MeshBuilder::createQuad(1.1f, 1.1f, 1.0f, 1.0f, false);
+        beamBladeMesh = MeshBuilder::createBox(0.06f, 1.6f, 0.03f, 1.0f, 1.0f);
 
-        // د) قطعة الديكور الإضافية المميزة لسمة المشاهير (Decor 4: VIP Red Carpet & Brass Stanchions)
-        redCarpetMesh = MeshBuilder::createQuad(2.3f, 6.2f, 1.0f, 1.0f, true);
-        redCarpetBorderMesh = MeshBuilder::createQuad(2.45f, 6.3f, 1.0f, 1.0f, true);
+        // 6. السجادة الحمراء في الزاوية اليسارية مع أعمدة الحواجز الذهبية
+        redCarpetMesh = MeshBuilder::createQuad(2.4f, 9.0f, 1.0f, 1.0f, true);
+        redCarpetBorderMesh = MeshBuilder::createQuad(2.55f, 9.15f, 1.0f, 1.0f, true);
 
         stanchionPostMesh = MeshBuilder::createCylinder(0.042f, 0.042f, 1.15f, 16);
         stanchionBaseMesh = MeshBuilder::createCylinder(0.22f, 0.17f, 0.08f, 16);
         stanchionBallMesh = MeshBuilder::createSphere(0.072f, 12, 16);
 
-        // حبال المخمل الحمراء المنحنية بدقة في الفضاء ثلاثي الأبعاد
-        velvetRopeLeft1  = MeshBuilder::createCurvedRope(glm::vec3(-1.35f, 1.05f, -2.0f), glm::vec3(-1.35f, 1.05f, -4.4f), 0.22f, 0.032f);
-        velvetRopeLeft2  = MeshBuilder::createCurvedRope(glm::vec3(-1.35f, 1.05f, -4.4f), glm::vec3(-1.35f, 1.05f, -6.8f), 0.22f, 0.032f);
-        velvetRopeRight1 = MeshBuilder::createCurvedRope(glm::vec3( 1.35f, 1.05f, -2.0f), glm::vec3( 1.35f, 1.05f, -4.4f), 0.22f, 0.032f);
-        velvetRopeRight2 = MeshBuilder::createCurvedRope(glm::vec3( 1.35f, 1.05f, -4.4f), glm::vec3( 1.35f, 1.05f, -6.8f), 0.22f, 0.032f);
+        // حبال المخمل على جانبي مسار السجادة اليسارية
+        velvetRopeLeft1 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  3.0f), glm::vec3(-5.35f, 1.05f,  0.5f), 0.18f, 0.032f);
+        velvetRopeLeft2 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  0.5f), glm::vec3(-5.35f, 1.05f, -2.0f), 0.18f, 0.032f);
+        velvetRopeLeft3 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f, -2.0f), glm::vec3(-5.35f, 1.05f, -4.5f), 0.18f, 0.032f);
+
+        velvetRopeRight1 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f,  3.0f), glm::vec3(-3.05f, 1.05f,  0.5f), 0.18f, 0.032f);
+        velvetRopeRight2 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f,  0.5f), glm::vec3(-3.05f, 1.05f, -2.0f), 0.18f, 0.032f);
+        velvetRopeRight3 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f, -2.0f), glm::vec3(-3.05f, 1.05f, -4.5f), 0.18f, 0.032f);
     }
 
     void render(Shader& shader) {
@@ -116,7 +119,7 @@ public:
         shader.setVec4("objectColor", glm::vec4(1.0f));
 
         // -------------------------------------------------------------
-        // 1. رسم أرضية الغرفة الخشبية الفاخرة المصقولة (Polished Hardwood Floor)
+        // 1. أرضية وجدران الغرفة
         // -------------------------------------------------------------
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, floorTextureId);
@@ -127,9 +130,6 @@ public:
         shader.setMat4("model", model);
         floorMesh.draw();
 
-        // -------------------------------------------------------------
-        // 2. رسم جدران الغرفة مع ورق الجدران الفاخر آرت ديكو (VIP Wallpaper)
-        // -------------------------------------------------------------
         glBindTexture(GL_TEXTURE_2D, wallpaperTextureId);
 
         // الجدار الخلفي (-Z)
@@ -152,39 +152,77 @@ public:
         shader.setMat4("model", model);
         wallMesh.draw();
 
+        // -------------------------------------------------------------
+        // 2. السجادة الحمراء وأعمدة الحواجز في الزاوية اليسارية (Left Bottom Corner)
+        // -------------------------------------------------------------
+        glm::vec3 carpetPos(-4.2f, 0.0f, -1.0f);
+
+        // إطار السجادة الذهبي
+        shader.setBool("useTexture", false);
+        shader.setVec4("objectColor", glm::vec4(0.85f, 0.70f, 0.22f, 1.0f));
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(carpetPos.x, 0.003f, carpetPos.z));
+        shader.setMat4("model", model);
+        redCarpetBorderMesh.draw();
+
+        // السجادة الحمراء
+        shader.setVec4("objectColor", glm::vec4(0.75f, 0.07f, 0.12f, 1.0f));
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(carpetPos.x, 0.006f, carpetPos.z));
+        shader.setMat4("model", model);
+        redCarpetMesh.draw();
+
+        // أعمدة الحواجز النحاسية على جانبي السجادة اليسارية
+        shader.setVec4("objectColor", glm::vec4(0.92f, 0.78f, 0.28f, 1.0f));
+
+        float stanchionXs[2] = {-5.35f, -3.05f};
+        float stanchionZs[4] = {3.0f, 0.5f, -2.0f, -4.5f};
+
+        for (float sx : stanchionXs) {
+            for (float sz : stanchionZs) {
+                // القاعدة
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(sx, 0.04f, sz));
+                shader.setMat4("model", model);
+                stanchionBaseMesh.draw();
+
+                // العمود
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(sx, 0.58f, sz));
+                shader.setMat4("model", model);
+                stanchionPostMesh.draw();
+
+                // الكرة العلوية
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(sx, 1.18f, sz));
+                shader.setMat4("model", model);
+                stanchionBallMesh.draw();
+            }
+        }
+
+        // حبال المخمل الحمراء على السجادة اليسارية
+        shader.setVec4("objectColor", glm::vec4(0.70f, 0.06f, 0.10f, 1.0f));
+        model = glm::mat4(1.0f);
+        shader.setMat4("model", model);
+
+        velvetRopeLeft1.draw();
+        velvetRopeLeft2.draw();
+        velvetRopeLeft3.draw();
+        velvetRopeRight1.draw();
+        velvetRopeRight2.draw();
+        velvetRopeRight3.draw();
+
+        // تمثال الأوسكار في نهاية ممر السجادة اليسارية
+        glm::vec3 oscarPos(-4.2f, 2.2f, -5.0f);
+
+        glBindTexture(GL_TEXTURE_2D, floorTextureId);
         shader.setBool("useTexture", true);
         shader.setVec4("objectColor", glm::vec4(1.0f));
-
-        // -------------------------------------------------------------
-        // 3. رسم الملصق الفني الممزق في الجدار الخلفي (The Torn Celebrity Poster)
-        // معلق على الجدار الخلفي ويظهر خلفه ورق الجدران بوضوح تام من الزاوية الممزقة
-        // -------------------------------------------------------------
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, posterTextureId);
-        shader.setInt("texture_diffuse1", 0);
-
-        model = glm::mat4(1.0f);
-        // نضعه على بعد ميليمترات طفيفة من الجدار الخلفي (-7.95) ليكون في مجال رؤية اللاعب تماماً
-        model = glm::translate(model, glm::vec3(-2.6f, 4.4f, -roomDepth * 0.5f + 0.05f));
-        shader.setMat4("model", model);
-        tornPosterMesh.draw();
-
-        // -------------------------------------------------------------
-        // 4. رسم قطع الديكور الثلاث الأساسية (The 3 Diverse Celebrity Decor Pieces)
-        // -------------------------------------------------------------
-
-        // --- قطعة الديكور 1: قاعدة فاخرة + تمثال الأوسكار الذهبي ثلاثي الأبعاد (Assimp 3D Model) ---
-        // موقعها بجانب الطاولة في المنظور الأمامي بوضوح تام
-        glm::vec3 oscarPos(-3.3f, 2.2f, -1.8f);
-
-        // أ) رسم القاعدة الخشبية المصقولة
-        glBindTexture(GL_TEXTURE_2D, floorTextureId);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(oscarPos.x, 1.075f, oscarPos.z));
         shader.setMat4("model", model);
         oscarPedestalMesh.draw();
 
-        // غطاء القاعدة الذهبي الفاخر
         shader.setBool("useTexture", false);
         shader.setVec4("objectColor", glm::vec4(0.85f, 0.70f, 0.22f, 1.0f));
         model = glm::mat4(1.0f);
@@ -192,7 +230,6 @@ public:
         shader.setMat4("model", model);
         oscarPedestalCapMesh.draw();
 
-        // ب) رسم مجسم تمثال الأوسكار الذهبي ثلاثي الأبعاد باستخدام Assimp
         if (oscar3DModel) {
             shader.setBool("useTexture", true);
             shader.setVec4("objectColor", glm::vec4(1.0f));
@@ -203,51 +240,61 @@ public:
             oscar3DModel->Draw(shader);
         }
 
-        // --- قطعة الديكور 2: خزانة المشاهير للأسطوانات البلاتينية والجوائز (Celebrity VIP Showcase) ---
-        // بجانب الجدار الأيمن للغرفة بأبعاد واقعية وإكساء فاخر بدون أي تشوه
-        // أ) جسم الخزانة الخشبي
+        // -------------------------------------------------------------
+        // 3. خزانة المشاهير في الزاوية اليمينية (Right Bottom Corner - VIP Showcase)
+        // موضوعة خلف الخصم وموجهة مباشرة نحو منظور اللاعب
+        // -------------------------------------------------------------
+        glm::vec3 showcasePos(3.5f, 1.8f, -3.8f);
+
+        // هيكل الخزانة
         shader.setBool("useTexture", true);
         shader.setVec4("objectColor", glm::vec4(1.0f));
         glBindTexture(GL_TEXTURE_2D, floorTextureId);
-
-        glm::vec3 showcasePos(roomWidth * 0.5f - 0.45f, 2.1f, -2.2f);
         model = glm::mat4(1.0f);
         model = glm::translate(model, showcasePos);
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setMat4("model", model);
         showcaseFrameMesh.draw();
 
-        // ب) الواجهة الأمامية للخزانة (الأسطوانات البلاتينية والذهبية وجوائز المشاهير)
+        // واجهة الأسطوانات والجوائز
         glBindTexture(GL_TEXTURE_2D, bookshelfTextureId);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, showcasePos + glm::vec3(-0.33f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(model, showcasePos + glm::vec3(0.0f, 0.0f, 0.33f));
         shader.setMat4("model", model);
         showcaseFrontMesh.draw();
 
-        // --- قطعة الديكور 3: نجمة ممر الشهرة وأشعة الأضواء الذهبية (Walk of Fame Star Crest) ---
-        // معلقة في أعلى الجدار الخلفي فوق الطاولة
-        glm::vec3 starPos(0.0f, 5.6f, -roomDepth * 0.5f + 0.12f);
+        // -------------------------------------------------------------
+        // 4. المنطقة الوسطى (Middle Area): الملصق الفني الممزق ونجمة ممر الشهرة بدون أي تداخل
+        // -------------------------------------------------------------
+        // أ) الملصق الفني الممزق في المنتصف بارتفاع مناسب (Y = 1.95)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, posterTextureId);
+        shader.setInt("texture_diffuse1", 0);
 
-        // أولاً: رسم شعاعي الأضواء الذهبية المتقاطعين
-        shader.setBool("useTexture", false);
-        shader.setVec4("objectColor", glm::vec4(0.92f, 0.78f, 0.25f, 1.0f)); // ذهبي لماع
-
-        // الشعاع الأول (+45 درجة)
         model = glm::mat4(1.0f);
-        model = glm::translate(model, starPos + glm::vec3(0.0f, 0.0f, -0.04f));
+        model = glm::translate(model, glm::vec3(0.0f, 1.95f, -roomDepth * 0.5f + 0.05f));
+        shader.setMat4("model", model);
+        tornPosterMesh.draw();
+
+        // ب) نجمة ممر الشهرة في المنتصف أعلى الملصق مباشرة (Y = 3.45) مع فاصل كافٍ لمنع أي تداخل
+        glm::vec3 starPos(0.0f, 3.45f, -roomDepth * 0.5f + 0.07f);
+
+        // أشعة الأضواء الذهبية المتقاطعة
+        shader.setBool("useTexture", false);
+        shader.setVec4("objectColor", glm::vec4(0.92f, 0.78f, 0.25f, 1.0f));
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, starPos + glm::vec3(0.0f, 0.0f, -0.02f));
         model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         shader.setMat4("model", model);
         beamBladeMesh.draw();
 
-        // الشعاع الثاني (-45 درجة)
         model = glm::mat4(1.0f);
-        model = glm::translate(model, starPos + glm::vec3(0.0f, 0.0f, -0.04f));
+        model = glm::translate(model, starPos + glm::vec3(0.0f, 0.0f, -0.02f));
         model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         shader.setMat4("model", model);
         beamBladeMesh.draw();
 
-        // ثانياً: رسم نجمة المشاهير الذهبية في المنتصف
+        // نجمة المشاهير الذهبية
         shader.setBool("useTexture", true);
         shader.setVec4("objectColor", glm::vec4(1.0f));
         glBindTexture(GL_TEXTURE_2D, shieldTextureId);
@@ -256,65 +303,6 @@ public:
         model = glm::translate(model, starPos);
         shader.setMat4("model", model);
         starCrestMesh.draw();
-
-        // -------------------------------------------------------------
-        // 5. رسم قطعة الديكور الإضافية: السجادة الحمراء وأعمدة الحبال المخملية (VIP Red Carpet)
-        // -------------------------------------------------------------
-        // أ) إطار السجادة الذهبي
-        shader.setBool("useTexture", false);
-        shader.setVec4("objectColor", glm::vec4(0.85f, 0.70f, 0.22f, 1.0f));
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.003f, -4.6f));
-        shader.setMat4("model", model);
-        redCarpetBorderMesh.draw();
-
-        // ب) السجادة الحمراء الملكية
-        shader.setVec4("objectColor", glm::vec4(0.72f, 0.07f, 0.12f, 1.0f));
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.006f, -4.6f));
-        shader.setMat4("model", model);
-        redCarpetMesh.draw();
-
-        // ج) أعمدة الحواجز النحاسية الذهبية (6 Stanchions)
-        shader.setVec4("objectColor", glm::vec4(0.92f, 0.78f, 0.28f, 1.0f)); // لمعان النحاس الذهبي
-
-        float stanchionXs[2] = {-1.35f, 1.35f};
-        float stanchionZs[3] = {-2.0f, -4.4f, -6.8f};
-
-        for (float sx : stanchionXs) {
-            for (float sz : stanchionZs) {
-                // القاعدة الدائرية الثقيلة
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(sx, 0.04f, sz));
-                shader.setMat4("model", model);
-                stanchionBaseMesh.draw();
-
-                // العمود الأسطواني النحاسي
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(sx, 0.58f, sz));
-                shader.setMat4("model", model);
-                stanchionPostMesh.draw();
-
-                // الكرة الذهبية العلوية
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(sx, 1.18f, sz));
-                shader.setMat4("model", model);
-                stanchionBallMesh.draw();
-            }
-        }
-
-        // د) حبال المخمل الحمراء المنحنية بأناقة بين الأعمدة
-        shader.setVec4("objectColor", glm::vec4(0.68f, 0.06f, 0.10f, 1.0f)); // مخمل أحمر غامق
-        model = glm::mat4(1.0f);
-        shader.setMat4("model", model);
-
-        velvetRopeLeft1.draw();
-        velvetRopeLeft2.draw();
-        velvetRopeRight1.draw();
-        velvetRopeRight2.draw();
-
-        shader.setBool("useTexture", true);
-        shader.setVec4("objectColor", glm::vec4(1.0f));
     }
 
     void cleanup() {
@@ -335,8 +323,10 @@ public:
         stanchionBallMesh.cleanup();
         velvetRopeLeft1.cleanup();
         velvetRopeLeft2.cleanup();
+        velvetRopeLeft3.cleanup();
         velvetRopeRight1.cleanup();
         velvetRopeRight2.cleanup();
+        velvetRopeRight3.cleanup();
         if (oscar3DModel) {
             delete oscar3DModel;
             oscar3DModel = nullptr;

@@ -9,9 +9,9 @@
 #include "MeshBuilder.hpp"
 
 enum class CardState {
-    IN_DECK,            // Card in deck (always flat on table, face-down showing back texture)
-    ANIMATING_TO_PLAY,  // Card in flight: lifts, rotates 180 degrees to face player
-    PLAYED              // Card settled in played zone, standing/facing player
+    IN_DECK,            // البطاقة داخل مخزون اللاعب (مسطحة ومقلوبة على وجهها الخلفي)
+    ANIMATING_TO_PLAY,  // البطاقة في حالة حركة وتحليق وتدوير لتواجه اللاعب
+    PLAYED              // البطاقة مستقرة في منطقة اللعب وتواجه اللاعب
 };
 
 class Card {
@@ -21,17 +21,17 @@ public:
     unsigned int backTextureId = 0;
     CardState state = CardState::IN_DECK;
 
-    int slotIndex = -1; // Target played slot index (0 to 4)
+    int slotIndex = -1; // الفتحة التي ستستقر فيها البطاقة (0 إلى 4)
 
-    // Spatial coordinates
+    // إحداثيات الحركة والموقع
     glm::vec3 currentPos;
     glm::vec3 startPos;
     glm::vec3 targetPos;
 
-    float moveProgress = 0.0f;     // Flight progress [0.0 -> 1.0]
-    float moveDuration = 1.15f;    // Flight duration in seconds
+    float moveProgress = 0.0f;     // نسبة تقدم تحريك البطاقة [0.0 -> 1.0]
+    float moveDuration = 1.15f;    // مدة حركة الطيران بالثواني
 
-    // Standard card dimensions
+    // أبعاد البطاقة القياسية
     float width = 0.72f;
     float height = 1.08f;
 
@@ -41,7 +41,7 @@ public:
         : characterName(name), frontTextureId(frontTex), backTextureId(backTex),
           state(CardState::IN_DECK), currentPos(deckPos), startPos(deckPos), targetPos(deckPos) {}
 
-    // Initiate 3D card draw movement to target slot
+    // بدء حركة نقل البطاقة إلى منطقة اللعب
     void playToSlot(int slot, const glm::vec3& slotPosition) {
         state = CardState::ANIMATING_TO_PLAY;
         slotIndex = slot;
@@ -50,7 +50,7 @@ public:
         moveProgress = 0.0f;
     }
 
-    // Per-frame physics and animation update
+    // تحديث تحريك البطاقة في كل إطار
     void update(float deltaTime) {
         if (state == CardState::ANIMATING_TO_PLAY) {
             moveProgress += deltaTime / moveDuration;
@@ -65,15 +65,15 @@ public:
 
                 currentPos.x = glm::mix(startPos.x, targetPos.x, ease);
                 currentPos.z = glm::mix(startPos.z, targetPos.z, ease);
-                // Parabolic arc along Y axis: lifts high then lands smoothly
+                // Parabolic arc in Y axis: lift up into air then settle down
                 float arcHeight = 0.95f * std::sin(moveProgress * 3.14159265f);
                 currentPos.y = glm::mix(startPos.y, targetPos.y, ease) + arcHeight;
             }
         }
     }
 
-    // Render card with model matrices (Translate, Rotate, Scale)
-    // standProgress: 0.0 = flat on table (top-down view), 1.0 = upright facing player (player view)
+    // رسم البطاقة مع تطبيق مصفوفات التحويل (Translate, Rotate, Scale)
+    // standProgress: 0.0 = مستوية أفقياً على الطاولة (منظور علوي)، 1.0 = واقفة طولياً تواجه اللاعب (منظور اللاعب)
     void render(Shader& shader, const SimpleMesh& frontMesh, const SimpleMesh& backMesh, float standProgress) {
         shader.use();
 
@@ -84,61 +84,61 @@ public:
         float liftPivot = 0.0f;
 
         if (state == CardState::IN_DECK) {
-            // Undrawn cards in deck: ALWAYS flat on table regardless of camera mode,
-            // face-down so the standard luxury card back is visible on top
+            // البطاقات غير المسحوبة: تبقى دائماً مستوية على الطاولة أفقياً بغض النظر عن وضع الكاميرا
+            // ومقلوبة لأسفل بحيث يظهر وجه البطاقة الخلفي الموحد للأعلى كما في ألعاب الورق الحقيقية
             pitchAngle = -90.0f;
-            flipAngle = 180.0f; // Back texture faces UP towards player/camera
+            flipAngle = 180.0f; // الوجه الخلفي يواجه اللاعب/الكاميرا من الأعلى
             liftPivot = 0.0f;
         } else if (state == CardState::ANIMATING_TO_PLAY) {
-            // During flight: card flips 180 degrees to reveal celebrity face
+            // أثناء الطيران واللعب: تدور البطاقة 180 درجة لتواجه اللاعب وترتفع بنعومة
             float t = moveProgress;
             float ease = t * t * (3.0f - 2.0f * t);
 
-            // Smooth 180 -> 0 degree flip rotation
+            // تدوير البطاقة من الوجه الخلفي (180 درجة) إلى الوجه الأمامي (0 درجة)
             flipAngle = (1.0f - ease) * 180.0f;
 
-            // Smooth pitch interpolation to target camera pitch
+            // الانتقال السلس لزاوية الميل نحو اللاعب
             float targetPitch = glm::mix(-90.0f, -15.0f, standProgress);
             pitchAngle = glm::mix(-90.0f, targetPitch, ease);
 
             liftPivot = (height * 0.5f) * std::sin(glm::radians(pitchAngle + 90.0f));
         } else { // CardState::PLAYED
-            // Played cards: stand upright in Player view (State 2) or lie flat in Top-Down view (State 1)
+            // البطاقات الملعوبة: تقف طولياً لتواجه اللاعب في المنظور 2، أو تستوي في المنظور 1
             pitchAngle = glm::mix(-90.0f, -15.0f, standProgress);
-            flipAngle = 0.0f; // Front face (celebrity portrait) faces player
+            flipAngle = 0.0f; // الوجه الأمامي (صورة المشاهير) يواجه اللاعب تماماً
             liftPivot = (height * 0.5f) * std::sin(glm::radians(pitchAngle + 90.0f));
         }
 
-        // Lift card center as it tilts so bottom edge rests perfectly on table surface
+        // رفع مركز البطاقة مع وقوفها بحيث ترتكز حافتها السفلية دائماً على سطح الطاولة بنعومة
         glm::vec3 renderPos = currentPos;
         renderPos.y += liftPivot;
 
-        // 1. Translation to 3D position
+        // 1. نقل البطاقة إلى موقعها ثلاثي الأبعاد
         model = glm::translate(model, renderPos);
 
-        // 2. Gentle flight wobble
+        // 2. دوران فيزيائي خفيف أثناء الطيران
         if (state == CardState::ANIMATING_TO_PLAY) {
             float wobble = std::sin(moveProgress * 3.14159265f) * 14.0f;
             model = glm::rotate(model, glm::radians(wobble), glm::vec3(0.0f, 0.0f, 1.0f));
         }
 
-        // 3. Pitch rotation (tilt towards player or lie flat)
+        // 3. ميلان البطاقة (Pitch) نحو اللاعب أو استوائها أفقياً
         model = glm::rotate(model, glm::radians(pitchAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        // 4. Flip rotation (180 deg face-down in deck -> 0 deg face-up to player)
+        // 4. قلب البطاقة (Flip 180 -> 0) لإظهار صورة الشخصية عندما تلعب
         model = glm::rotate(model, glm::radians(flipAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 
         shader.setMat4("model", model);
         shader.setBool("useTexture", true);
         shader.setVec4("objectColor", glm::vec4(1.0f));
 
-        // Front Face (Celebrity Portrait)
+        // رسم الوجه الأمامي (صورة المشاهير)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, frontTextureId);
         shader.setInt("texture_diffuse1", 0);
         frontMesh.draw();
 
-        // Back Face (Standard Luxury Card Back)
+        // رسم الوجه الخلفي (الإكساء الخلفي الفخم الموحد)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, backTextureId);
         shader.setInt("texture_diffuse1", 0);
