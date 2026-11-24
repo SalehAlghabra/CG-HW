@@ -96,21 +96,21 @@ public:
         beamBladeMesh = MeshBuilder::createBox(0.06f, 1.6f, 0.03f, 1.0f, 1.0f);
 
         // 6. السجادة الحمراء في الزاوية اليسارية مع أعمدة الحواجز الذهبية
-        redCarpetMesh = MeshBuilder::createQuad(2.4f, 9.0f, 1.0f, 1.0f, true);
-        redCarpetBorderMesh = MeshBuilder::createQuad(2.55f, 9.15f, 1.0f, 1.0f, true);
+        redCarpetMesh = MeshBuilder::createQuad(2.2f, 9.0f, 1.0f, 1.0f, true);
+        redCarpetBorderMesh = MeshBuilder::createQuad(2.35f, 9.15f, 1.0f, 1.0f, true);
 
         stanchionPostMesh = MeshBuilder::createCylinder(0.042f, 0.042f, 1.15f, 16);
         stanchionBaseMesh = MeshBuilder::createCylinder(0.22f, 0.17f, 0.08f, 16);
         stanchionBallMesh = MeshBuilder::createSphere(0.072f, 12, 16);
 
-        // حبال المخمل على جانبي مسار السجادة اليسارية
-        velvetRopeLeft1 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  3.0f), glm::vec3(-5.35f, 1.05f,  0.5f), 0.18f, 0.032f);
-        velvetRopeLeft2 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  0.5f), glm::vec3(-5.35f, 1.05f, -2.0f), 0.18f, 0.032f);
-        velvetRopeLeft3 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f, -2.0f), glm::vec3(-5.35f, 1.05f, -4.5f), 0.18f, 0.032f);
+        // حبال المخمل على جانبي مسار السجادة اليسارية (x = -6.5)
+        velvetRopeLeft1 = MeshBuilder::createCurvedRope(glm::vec3(-7.65f, 1.05f,  3.0f), glm::vec3(-7.65f, 1.05f,  0.5f), 0.18f, 0.032f);
+        velvetRopeLeft2 = MeshBuilder::createCurvedRope(glm::vec3(-7.65f, 1.05f,  0.5f), glm::vec3(-7.65f, 1.05f, -2.0f), 0.18f, 0.032f);
+        velvetRopeLeft3 = MeshBuilder::createCurvedRope(glm::vec3(-7.65f, 1.05f, -2.0f), glm::vec3(-7.65f, 1.05f, -4.5f), 0.18f, 0.032f);
 
-        velvetRopeRight1 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f,  3.0f), glm::vec3(-3.05f, 1.05f,  0.5f), 0.18f, 0.032f);
-        velvetRopeRight2 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f,  0.5f), glm::vec3(-3.05f, 1.05f, -2.0f), 0.18f, 0.032f);
-        velvetRopeRight3 = MeshBuilder::createCurvedRope(glm::vec3(-3.05f, 1.05f, -2.0f), glm::vec3(-3.05f, 1.05f, -4.5f), 0.18f, 0.032f);
+        velvetRopeRight1 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  3.0f), glm::vec3(-5.35f, 1.05f,  0.5f), 0.18f, 0.032f);
+        velvetRopeRight2 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f,  0.5f), glm::vec3(-5.35f, 1.05f, -2.0f), 0.18f, 0.032f);
+        velvetRopeRight3 = MeshBuilder::createCurvedRope(glm::vec3(-5.35f, 1.05f, -2.0f), glm::vec3(-5.35f, 1.05f, -4.5f), 0.18f, 0.032f);
     }
 
     void render(Shader& shader) {
@@ -153,9 +153,9 @@ public:
         wallMesh.draw();
 
         // -------------------------------------------------------------
-        // 2. السجادة الحمراء وأعمدة الحواجز في الزاوية اليسارية (Left Bottom Corner)
+        // 2. السجادة الحمراء وأعمدة الحواجز في الزاوية اليسارية (Left Bottom Corner at x = -6.5)
         // -------------------------------------------------------------
-        glm::vec3 carpetPos(-4.2f, 0.0f, -1.0f);
+        glm::vec3 carpetPos(-6.5f, 0.0f, -1.0f);
 
         // إطار السجادة الذهبي
         shader.setBool("useTexture", false);
@@ -175,7 +175,7 @@ public:
         // أعمدة الحواجز النحاسية على جانبي السجادة اليسارية
         shader.setVec4("objectColor", glm::vec4(0.92f, 0.78f, 0.28f, 1.0f));
 
-        float stanchionXs[2] = {-5.35f, -3.05f};
+        float stanchionXs[2] = {-7.65f, -5.35f};
         float stanchionZs[4] = {3.0f, 0.5f, -2.0f, -4.5f};
 
         for (float sx : stanchionXs) {
@@ -213,7 +213,7 @@ public:
         velvetRopeRight3.draw();
 
         // تمثال الأوسكار في نهاية ممر السجادة اليسارية
-        glm::vec3 oscarPos(-4.2f, 2.2f, -5.0f);
+        glm::vec3 oscarPos(-6.5f, 2.2f, -5.0f);
 
         glBindTexture(GL_TEXTURE_2D, floorTextureId);
         shader.setBool("useTexture", true);
